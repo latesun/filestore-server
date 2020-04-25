@@ -14,8 +14,8 @@ func GetCephConnection() *s3.S3 {
 	if cephConn != nil {
 		return cephConn
 	}
-	// 1. 初始化ceph的一些信息
 
+	// 1. 初始化
 	auth := aws.Auth{
 		AccessKey: cfg.CephAccessKey,
 		SecretKey: cfg.CephSecretKey,
