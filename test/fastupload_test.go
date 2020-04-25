@@ -1,10 +1,10 @@
-package main
+package test
 
 import (
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
+	"testing"
 )
 
 var (
@@ -15,25 +15,21 @@ var (
 	filename  = "just_for_test"
 )
 
-func test_upload() {
-
+func TestUpload(t *testing.T) {
 	resp, err := http.PostForm(targetURL, url.Values{
 		"username": {username},
 		"token":    {token},
 		"filehash": {filehash},
 		"filename": {filename},
 	})
-	log.Printf("error: %+v\n", err)
-	log.Printf("resp: %+v\n", resp)
+
+	t.Logf("error: %+v\n", err)
+	t.Logf("resp: %+v\n", resp)
 	if resp != nil {
 		body, err := ioutil.ReadAll(resp.Body)
-		log.Printf("parseBodyErr: %+v\n", err)
+		t.Logf("parseBodyErr: %+v\n", err)
 		if err == nil {
-			log.Printf("parseBody: %+v\n", string(body))
+			t.Logf("parseBody: %+v\n", string(body))
 		}
 	}
-}
-
-func main() {
-	test_upload()
 }

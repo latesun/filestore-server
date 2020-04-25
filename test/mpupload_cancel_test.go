@@ -1,18 +1,19 @@
-package main
+package test
 
 import (
 	"bufio"
 	"bytes"
-	cfg "filestore-server/config"
-	fsUtil "filestore-server/util"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
-	"path/filepath"
 	"strconv"
+	"testing"
+
+	cfg "filestore-server/config"
+	fsUtil "filestore-server/util"
 
 	jsonit "github.com/json-iterator/go"
 )
@@ -100,7 +101,7 @@ func multipartUpload(filename string, targetURL string, chunkSize int) error {
 	return nil
 }
 
-func main() {
+func TestMpUploadCancel(t *testing.T) {
 	// 用户名/密码
 	username := "test2020"
 	password := "test2020"
@@ -161,15 +162,12 @@ func main() {
 		uploadEntry, username, token, uploadID)
 	multipartUpload(fpath, tURL, chunkSize)
 
-	// 4. 请求分块完成接口
+	// 4. 取消分块上传接口
 	resp, err = http.PostForm(
-		fmt.Sprintf("%s/file/mpupload/complete", uploadEntry),
+		fmt.Sprintf("%s/file/mpupload/cancel", uploadEntry),
 		url.Values{
 			"username": {username},
 			"token":    {token},
-			"filehash": {fhash},
-			"filesize": {strconv.Itoa(filesize)},
-			"filename": {filepath.Base(fpath)},
 			"uploadid": {uploadID},
 		})
 
@@ -185,5 +183,5 @@ func main() {
 		fmt.Println(err.Error())
 		os.Exit(-1)
 	}
-	fmt.Printf("complete result: %s\n", string(body))
+	fmt.Printf("cancel upload result: %s\n", string(body))
 }
