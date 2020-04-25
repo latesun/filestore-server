@@ -33,7 +33,6 @@
 package assets
 
 import (
-	"github.com/moxiaomomo/go-bindata-assetfs"
 	"bytes"
 	"compress/gzip"
 	"fmt"
@@ -43,6 +42,8 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/moxiaomomo/go-bindata-assetfs"
 )
 
 func bindataRead(data []byte, name string) ([]byte, error) {
