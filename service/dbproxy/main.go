@@ -1,18 +1,18 @@
 package main
 
 import (
-	"filestore-server/common"
-	"filestore-server/service/dbproxy/config"
 	"log"
 	"time"
+
+	"filestore-server/common"
+	"filestore-server/service/dbproxy/config"
+	dbConn "filestore-server/service/dbproxy/conn"
+	dbProxy "filestore-server/service/dbproxy/proto"
+	dbRpc "filestore-server/service/dbproxy/rpc"
 
 	"github.com/micro/cli"
 	"github.com/micro/go-micro"
 	_ "github.com/micro/go-plugins/registry/kubernetes"
-
-	dbConn "filestore-server/service/dbproxy/conn"
-	dbProxy "filestore-server/service/dbproxy/proto"
-	dbRpc "filestore-server/service/dbproxy/rpc"
 )
 
 func startRpcService() {
@@ -37,7 +37,10 @@ func startRpcService() {
 	// 初始化db connection
 	dbConn.InitDBConn()
 
-	dbProxy.RegisterDBProxyServiceHandler(service.Server(), new(dbRpc.DBProxy))
+	if err := dbProxy.RegisterDBProxyServiceHandler(service.Server(), new(dbRpc.DBProxy)); err != nil {
+		log.Println(err)
+	}
+
 	if err := service.Run(); err != nil {
 		log.Println(err)
 	}

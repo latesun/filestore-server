@@ -28,5 +28,9 @@ func TestCeph(t *testing.T) {
 
 	// 查询这个bucket下面指定条件的object keys
 	res, err = bucket.List("", "", "", 100)
+	if err != nil {
+		t.Log(err)
+		return
+	}
 	t.Logf("object keys: %+v\n", res)
 }

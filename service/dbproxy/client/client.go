@@ -73,25 +73,33 @@ func ToTableUser(src interface{}) orm.TableUser {
 
 func ToTableFile(src interface{}) orm.TableFile {
 	file := orm.TableFile{}
-	mapstructure.Decode(src, &file)
+	if err := mapstructure.Decode(src, &file); err != nil {
+		return orm.TableFile{}
+	}
 	return file
 }
 
 func ToTableFiles(src interface{}) []orm.TableFile {
 	file := []orm.TableFile{}
-	mapstructure.Decode(src, &file)
+	if err := mapstructure.Decode(src, &file); err != nil {
+		return nil
+	}
 	return file
 }
 
 func ToTableUserFile(src interface{}) orm.TableUserFile {
 	ufile := orm.TableUserFile{}
-	mapstructure.Decode(src, &ufile)
+	if err := mapstructure.Decode(src, &ufile); err != nil {
+		return orm.TableUserFile{}
+	}
 	return ufile
 }
 
 func ToTableUserFiles(src interface{}) []orm.TableUserFile {
 	ufile := []orm.TableUserFile{}
-	mapstructure.Decode(src, &ufile)
+	if err := mapstructure.Decode(src, &ufile); err != nil {
+		return nil
+	}
 	return ufile
 }
 

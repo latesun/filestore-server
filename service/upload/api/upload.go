@@ -10,8 +10,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/gin-gonic/gin"
-
 	cmn "filestore-server/common"
 	cfg "filestore-server/config"
 	"filestore-server/mq"
@@ -20,6 +18,8 @@ import (
 	"filestore-server/store/ceph"
 	"filestore-server/store/oss"
 	"filestore-server/util"
+
+	"github.com/gin-gonic/gin"
 )
 
 // DoUploadHandler ： 处理文件上传
@@ -84,7 +84,11 @@ func DoUploadHandler(c *gin.Context) {
 	}
 
 	// 5. 同步或异步将文件转移到Ceph/OSS
-	newFile.Seek(0, 0) // 游标重新回到文件头部
+	_, err = newFile.Seek(0, 0) // 游标重新回到文件头部
+	if err != nil {
+		log.Println("游标归零失败")
+	}
+
 	if cfg.CurrentStoreType == cmn.StoreCeph {
 		// 文件写入Ceph存储
 		data, _ := ioutil.ReadAll(newFile)
@@ -120,6 +124,7 @@ func DoUploadHandler(c *gin.Context) {
 			)
 			if !pubSuc {
 				// TODO: 当前发送转移信息失败，稍后重试
+				log.Println("发送转移信息失败")
 			}
 		}
 	}
@@ -184,6 +189,6 @@ func TryFastUploadHandler(c *gin.Context) {
 		Code: -2,
 		Msg:  "秒传失败，请稍后重试",
 	}
+
 	c.Data(http.StatusOK, "application/json", resp.JSONBytes())
-	return
 }

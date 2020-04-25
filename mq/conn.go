@@ -2,6 +2,7 @@ package mq
 
 import (
 	"log"
+	"time"
 
 	"filestore-server/config"
 
@@ -30,6 +31,7 @@ func Init() {
 	}
 	// 断线自动重连
 	go func() {
+		t := time.NewTicker(time.Minute)
 		for {
 			select {
 			case msg := <-notifyClose:
@@ -37,6 +39,8 @@ func Init() {
 				channel = nil
 				log.Printf("onNotifyChannelClosed: %+v\n", msg)
 				initChannel(config.RabbitURL)
+			case <-t.C:
+				break
 			}
 		}
 	}()

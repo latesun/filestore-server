@@ -43,7 +43,9 @@ func startRPCService() {
 	// 初始化mq client
 	mq.Init()
 
-	upProto.RegisterUploadServiceHandler(service.Server(), new(upRpc.Upload))
+	if err := upProto.RegisterUploadServiceHandler(service.Server(), new(upRpc.Upload)); err != nil {
+		fmt.Println(err)
+	}
 	if err := service.Run(); err != nil {
 		fmt.Println(err)
 	}
@@ -51,7 +53,7 @@ func startRPCService() {
 
 func startAPIService() {
 	router := route.Router()
-	router.Run(cfg.UploadServiceHost)
+	panic(router.Run(cfg.UploadServiceHost))
 	// service := web.NewService(
 	// 	web.Name("go.micro.web.upload"),
 	// 	web.Handler(router),
@@ -68,8 +70,15 @@ func startAPIService() {
 }
 
 func main() {
-	os.MkdirAll(config.TempLocalRootDir, 0777)
-	os.MkdirAll(config.TempPartRootDir, 0777)
+	err := os.MkdirAll(config.TempLocalRootDir, 0777)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = os.MkdirAll(config.TempPartRootDir, 0777)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	// api 服务
 	go startAPIService()

@@ -92,10 +92,7 @@ func multipartUpload(filename string, targetURL string, chunkSize int) error {
 	}
 
 	for idx := 0; idx < index; idx++ {
-		select {
-		case res := <-ch:
-			fmt.Printf("完成传输块index: %d\n", res)
-		}
+		fmt.Printf("完成传输块index: %d\n", <-ch)
 	}
 
 	return nil

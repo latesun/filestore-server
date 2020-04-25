@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"time"
 
 	"github.com/micro/go-micro"
@@ -30,8 +29,10 @@ func main() {
 	// 初始化dbproxy client
 	dbproxy.Init(service)
 
-	proto.RegisterUserServiceHandler(service.Server(), new(handler.User))
+	if err := proto.RegisterUserServiceHandler(service.Server(), new(handler.User)); err != nil {
+		panic(err)
+	}
 	if err := service.Run(); err != nil {
-		log.Println(err)
+		panic(err)
 	}
 }

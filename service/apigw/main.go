@@ -6,5 +6,5 @@ import (
 
 func main() {
 	r := route.Router()
-	r.Run(":8080")
+	panic(r.Run(":8080"))
 }
