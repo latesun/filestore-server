@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"time"
 
 	micro "github.com/micro/go-micro"
@@ -27,15 +26,17 @@ func startRPCService() {
 	// 初始化dbproxy client
 	dbproxy.Init(service)
 
-	dlProto.RegisterDownloadServiceHandler(service.Server(), new(dlRpc.Download))
+	if err := dlProto.RegisterDownloadServiceHandler(service.Server(), new(dlRpc.Download)); err != nil {
+		panic(err)
+	}
 	if err := service.Run(); err != nil {
-		fmt.Println(err)
+		panic(err)
 	}
 }
 
 func startAPIService() {
 	router := route.Router()
-	router.Run(cfg.DownloadServiceHost)
+	panic(router.Run(cfg.DownloadServiceHost))
 }
 
 func main() {

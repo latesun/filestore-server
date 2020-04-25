@@ -6,6 +6,7 @@ import (
 	"encoding/hex"
 	"hash"
 	"io"
+	"log"
 	"os"
 	"path/filepath"
 )
@@ -18,7 +19,10 @@ func (obj *Sha1Stream) Update(data []byte) {
 	if obj._sha1 == nil {
 		obj._sha1 = sha1.New()
 	}
-	obj._sha1.Write(data)
+	_, err := obj._sha1.Write(data)
+	if err != nil {
+		log.Println(err.Error())
+	}
 }
 
 func (obj *Sha1Stream) Sum() string {
@@ -27,25 +31,37 @@ func (obj *Sha1Stream) Sum() string {
 
 func Sha1(data []byte) string {
 	_sha1 := sha1.New()
-	_sha1.Write(data)
+	_, err := _sha1.Write(data)
+	if err != nil {
+		log.Println(err.Error())
+	}
 	return hex.EncodeToString(_sha1.Sum([]byte("")))
 }
 
 func FileSha1(file *os.File) string {
 	_sha1 := sha1.New()
-	io.Copy(_sha1, file)
+	_, err := io.Copy(_sha1, file)
+	if err != nil {
+		log.Println(err.Error())
+	}
 	return hex.EncodeToString(_sha1.Sum(nil))
 }
 
 func MD5(data []byte) string {
 	_md5 := md5.New()
-	_md5.Write(data)
+	_, err := _md5.Write(data)
+	if err != nil {
+		log.Println(err.Error())
+	}
 	return hex.EncodeToString(_md5.Sum([]byte("")))
 }
 
 func FileMD5(file *os.File) string {
 	_md5 := md5.New()
-	io.Copy(_md5, file)
+	_, err := io.Copy(_md5, file)
+	if err != nil {
+		log.Println(err.Error())
+	}
 	return hex.EncodeToString(_md5.Sum(nil))
 }
 
@@ -62,9 +78,13 @@ func PathExists(path string) (bool, error) {
 
 func GetFileSize(filename string) int64 {
 	var result int64
-	filepath.Walk(filename, func(path string, f os.FileInfo, err error) error {
+	err := filepath.Walk(filename, func(path string, f os.FileInfo, err error) error {
 		result = f.Size()
 		return nil
 	})
+	if err != nil {
+		return 0
+	}
+
 	return result
 }

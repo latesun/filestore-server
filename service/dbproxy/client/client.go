@@ -67,7 +67,9 @@ func parseBody(resp *dbProto.RespExec) *orm.ExecResult {
 
 func ToTableUser(src interface{}) orm.TableUser {
 	user := orm.TableUser{}
-	mapstructure.Decode(src, &user)
+	if err := mapstructure.Decode(src, &user); err != nil {
+		return orm.TableUser{}
+	}
 	return user
 }
 

@@ -157,7 +157,10 @@ func TestMpUploadCancel(t *testing.T) {
 	// 3. 请求分块上传接口
 	tURL := fmt.Sprintf("%s/file/mpupload/uppart?username=%s&token=%s&uploadid=%s",
 		uploadEntry, username, token, uploadID)
-	multipartUpload(fpath, tURL, chunkSize)
+	if err := multipartUpload(fpath, tURL, chunkSize); err != nil {
+		fmt.Println(err.Error())
+		os.Exit(-1)
+	}
 
 	// 4. 取消分块上传接口
 	resp, err = http.PostForm(

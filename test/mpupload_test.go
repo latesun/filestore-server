@@ -75,7 +75,10 @@ func TestMpUpload(t *testing.T) {
 	// 3. 请求分块上传接口
 	tURL := fmt.Sprintf("%s/file/mpupload/uppart?username=%s&token=%s&uploadid=%s",
 		uploadEntry, username, token, uploadID)
-	multipartUpload(fpath, tURL, chunkSize)
+	if err = multipartUpload(fpath, tURL, chunkSize); err != nil {
+		t.Log(err.Error())
+		os.Exit(-1)
+	}
 
 	// 4. 请求分块完成接口
 	resp, err = http.PostForm(

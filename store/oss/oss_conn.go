@@ -54,7 +54,9 @@ func BuildLifecycleRule(bucketName string) {
 	ruleTest1 := oss.BuildLifecycleRuleByDays("rule1", "test/", true, 30)
 	rules := []oss.LifecycleRule{ruleTest1}
 
-	Client().SetBucketLifecycle(bucketName, rules)
+	if err := Client().SetBucketLifecycle(bucketName, rules); err != nil {
+		fmt.Println(err)
+	}
 }
 
 // GenFileMeta :  构造文件元信息

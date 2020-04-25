@@ -31,7 +31,9 @@ type MultipartUploadInfo struct {
 }
 
 func init() {
-	os.MkdirAll(config.TempPartRootDir, 0744)
+	if err := os.MkdirAll(config.TempPartRootDir, 0744); err != nil {
+		panic(err)
+	}
 }
 
 // InitialMultipartUploadHandler : 初始化分块上传
@@ -64,9 +66,9 @@ func InitialMultipartUploadHandler(c *gin.Context) {
 	}
 
 	// 4. 将初始化信息写入到redis缓存
-	rConn.Do("HSET", "MP_"+upInfo.UploadID, "chunkcount", upInfo.ChunkCount)
-	rConn.Do("HSET", "MP_"+upInfo.UploadID, "filehash", upInfo.FileHash)
-	rConn.Do("HSET", "MP_"+upInfo.UploadID, "filesize", upInfo.FileSize)
+	_, _ = rConn.Do("HSET", "MP_"+upInfo.UploadID, "chunkcount", upInfo.ChunkCount)
+	_, _ = rConn.Do("HSET", "MP_"+upInfo.UploadID, "filehash", upInfo.FileHash)
+	_, _ = rConn.Do("HSET", "MP_"+upInfo.UploadID, "filesize", upInfo.FileSize)
 
 	// 5. 将响应初始化数据返回到客户端
 	c.JSON(
@@ -91,7 +93,17 @@ func UploadPartHandler(c *gin.Context) {
 
 	// 3. 获得文件句柄，用于存储分块内容
 	fpath := config.TempPartRootDir + uploadID + "/" + chunkIndex
-	os.MkdirAll(path.Dir(fpath), 0744)
+	if err := os.MkdirAll(path.Dir(fpath), 0744); err != nil {
+		c.JSON(
+			http.StatusOK,
+			gin.H{
+				"code": 0,
+				"msg":  "Upload part failed",
+				"data": nil,
+			})
+		return
+	}
+
 	fd, err := os.Create(fpath)
 	if err != nil {
 		c.JSON(
@@ -108,14 +120,17 @@ func UploadPartHandler(c *gin.Context) {
 	buf := make([]byte, 1024*1024)
 	for {
 		n, err := c.Request.Body.Read(buf)
-		fd.Write(buf[:n])
+		if err != nil {
+			break
+		}
+		_, err = fd.Write(buf[:n])
 		if err != nil {
 			break
 		}
 	}
 
 	// 4. 更新redis缓存状态
-	rConn.Do("HSET", "MP_"+uploadID, "chkidx_"+chunkIndex, 1)
+	_, _ = rConn.Do("HSET", "MP_"+uploadID, "chkidx_"+chunkIndex, 1)
 
 	// 5. 返回处理结果到客户端
 	c.JSON(

@@ -9,7 +9,7 @@ import (
 	"github.com/streadway/amqp"
 )
 
-var conn *amqp.Connection
+// var conn *amqp.Connection
 var channel *amqp.Channel
 
 // 如果异常关闭，会接收通知
@@ -35,7 +35,7 @@ func Init() {
 		for {
 			select {
 			case msg := <-notifyClose:
-				conn = nil
+				// conn = nil
 				channel = nil
 				log.Printf("onNotifyChannelClosed: %+v\n", msg)
 				initChannel(config.RabbitURL)
